@@ -28,14 +28,21 @@ def get_cat():
     cat_url = json_data[0]['url']
     return cat_url
 
+def get_quote():
+    response = requests.get('https://zenquotes.io/api/random')
+    json_data = json.loads(response.text)
+    quote = f"{json_data[0]['q']} - {json_data[0]['a'].split(' ')[0]}" # quote and first name of author 
+    return quote 
+
+
 @bot.event
 async def on_ready():
     print(f'{bot.user.name} has connected to Discord to the following guilds:')
     for guild in bot.guilds:
         print(f'- {guild}')
 
-@bot.command(name='cat', help='Gets an image of a cat.')
-async def get_one_cat(ctx):
+@bot.command(name='cat', help='Gets an image of a cat from TheCatApi.')
+async def cat(ctx):
 
     cat_url = get_cat()
    
@@ -44,6 +51,15 @@ async def get_one_cat(ctx):
             img = await resp.read() # reads image from response
             with io.BytesIO(img) as file: # converts to file-like object
                 await ctx.send(file=discord.File(file, "testimage.png"))
+
+@bot.command(name='quote', help='Gets an inspirational quote from https://zenquotes.io/ api')
+async def quote(ctx):
+    await ctx.send(get_quote())
+
+@bot.command(name='cat_quote', help='Gets an image of a cat with a quote')
+async def cat_quote(ctx):
+    await get_one_cat(ctx)
+    await quote(ctx)
 
         
 
