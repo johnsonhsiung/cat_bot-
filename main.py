@@ -58,7 +58,7 @@ async def quote(ctx):
 
 @bot.command(name='cat_quote', help='Gets an image of a cat with a quote')
 async def cat_quote(ctx):
-    await get_one_cat(ctx)
+    await cat(ctx)
     await quote(ctx)
 
         
