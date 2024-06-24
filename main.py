@@ -17,16 +17,16 @@ import aiohttp
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
+CAT_KEY =os.getenv('CAT_KEY')
 
 
 bot = commands.Bot(command_prefix='!')
 
 def get_cat():
     # just printing response gives me response[200] which is the whole response object. 
-    response = requests.get('https://api.thecatapi.com/v1/images/search')
+    response = requests.get(f'https://api.thecatapi.com/v1/images/search?api_key={CAT_KEY}')
     json_data = json.loads(response.text)
-    cat_url = json_data[0]['url']
-    return cat_url
+    return json_data
 
 def get_quote():
     response = requests.get('https://zenquotes.io/api/random')
@@ -44,7 +44,7 @@ async def on_ready():
 @bot.command(name='cat', help='Gets an image of a cat from TheCatApi.')
 async def cat(ctx):
 
-    cat_url = get_cat()
+    cat_url = get_cat()[0]['url']
    
     async with aiohttp.ClientSession() as session: # creates session
         async with session.get(cat_url) as resp: # gets image from url
@@ -60,6 +60,24 @@ async def quote(ctx):
 async def cat_quote(ctx):
     await cat(ctx)
     await quote(ctx)
+
+@bot.command(name='cat_quote_otd', help='Gets the cat quote of the day')
+async def cat_quote_otd(ctx):
+    json_cat = get_cat()
+    cat_id = json_cat[0]['id']
+    print(cat_id)
+    cat_data = {
+        'image_id' : cat_id,
+        'sub_id' : 'MASTER'
+    }
+
+    url = f'https://api.thecatapi.com/v1/favourites?api_key={CAT_KEY}'
+    x = requests.post(url, json=cat_data)
+    print(x)
+
+
+
+
 
         
 
